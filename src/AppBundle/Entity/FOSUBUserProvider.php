@@ -7,64 +7,87 @@ use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\FOSUBUserProvider as BaseClass;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-
 class FOSUBUserProvider extends BaseClass
 {
-    /**
-     * {@inheritDoc}
-     */
+
     public function connect(UserInterface $user, UserResponseInterface $response)
     {
         $property = $this->getProperty($response);
         $username = $response->getUsername();
-        //on connect - get the access token and the user ID
+
+        // On connect, retrieve the access token and the user id
         $service = $response->getResourceOwner()->getName();
-        $setter = 'set'.ucfirst($service);
-        $setter_id = $setter.'Id';
-        $setter_token = $setter.'AccessToken';
-        //we "disconnect" previously connected users
+
+        $setter = 'set' . ucfirst($service);
+        $setter_id = $setter . 'Id';
+        $setter_token = $setter . 'AccessToken';
+
+        // Disconnect previously connected users
         if (null !== $previousUser = $this->userManager->findUserBy(array($property => $username))) {
             $previousUser->$setter_id(null);
             $previousUser->$setter_token(null);
             $this->userManager->updateUser($previousUser);
         }
-        //we connect current user
+
+        // Connect using the current user
         $user->$setter_id($username);
         $user->$setter_token($response->getAccessToken());
         $this->userManager->updateUser($user);
     }
-    /**
-     * {@inheritdoc}
-     */
+
     public function loadUserByOAuthUserResponse(UserResponseInterface $response)
     {
+        // dump($this->getProperty($response));die;
         $username = $response->getUsername();
-        $user = $this->userManager->findUserBy(array($this->getProperty($response) => $username));
+        $email = $response->getEmail();
+
+        $user = $this->userManager->findUserByEmail($email);
+        $service = $response->getResourceOwner()->getName();
         //when the user is registrating
         if (null === $user) {
-            $service = $response->getResourceOwner()->getName();
             $setter = 'set'.ucfirst($service);
             $setter_id = $setter.'Id';
             $setter_token = $setter.'AccessToken';
-            // create new user here
+
             $user = $this->userManager->createUser();
             $user->$setter_id($username);
             $user->$setter_token($response->getAccessToken());
-            //I have set all requested data with the user's username
-            //modify here with relevant data
-            $user->setUsername($username);
-            $user->setEmail($username);
-            $user->setPassword($username);
+
+            $user->setUsername($this->generateRandomUsername($username, $response->getResourceOwner()->getName()));
+            $user->setEmail($email);
+            $user->setPassword(sha1(uniqid()));
             $user->setEnabled(true);
             $this->userManager->updateUser($user);
+
             return $user;
         }
         //if user exists - go with the HWIOAuth way
-        $user = parent::loadUserByOAuthUserResponse($response);
-        $serviceName = $response->getResourceOwner()->getName();
-        $setter = 'set' . ucfirst($serviceName) . 'AccessToken';
-        //update access token
-        $user->$setter($response->getAccessToken());
+        if ($username !== $user->getUsername()) {
+            $setter = 'set'.ucfirst($service);
+            $setter_id = $setter.'Id';
+            $user->$setter_id($username);
+        }
+        //update the accesss token
+        $setter_token = 'set' . ucfirst($service) . 'AccessToken';
+        $user->$setter_token($response->getAccessToken());
+
         return $user;
+    }
+
+    /**
+     * Generates a random username with the given
+     * e.g 12345_github, 12345_facebook
+     *
+     * @param string $username
+     * @param type $serviceName
+     * @return type
+     */
+    private function generateRandomUsername($username, $serviceName)
+    {
+        if (!$username) {
+            $username = "user". uniqid((rand()), true) . $serviceName;
+        }
+
+        return $username. "_" . $serviceName;
     }
 }
