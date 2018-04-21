@@ -20,6 +20,7 @@ class AppKernel extends Kernel
             new FOS\UserBundle\FOSUserBundle(),
             new Http\HttplugBundle\HttplugBundle(), // If you require the php-http/httplug-bundle package.
             new HWI\Bundle\OAuthBundle\HWIOAuthBundle(),
+            new FOS\RestBundle\FOSRestBundle(),
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {

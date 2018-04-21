@@ -1,9 +1,17 @@
 {% extends 'base.html.twig' %}
-
-{% block body %}
-  Hello Symfony
+{% block title %}Welcome to my calendar{% endblock %}
+{% block stylesheets %}
+  <link rel='stylesheet' href='build/fullcalendar.css'/>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
 {% endblock %}
 
-{% block stylesheets %}
+{% block body %}
+  <p>Hello Symfony</p>
+  <div id='calendar'></div>
+{% endblock %}
 
+{% block javascripts %}
+  <script src="{{ asset('build/fullcalendar.js') }}"></script>
+  <script src="{{ asset('build/gcal.js') }}"></script>
 {% endblock %}
