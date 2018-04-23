@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Event
@@ -24,6 +25,8 @@ class Event
     /**
      * @var string
      *
+     * @Assert\NotBlank()
+     * @Assert\Type("string")
      * @ORM\Column(name="title", type="string", length=255)
      */
     private $title;
@@ -31,6 +34,7 @@ class Event
     /**
      * @var \DateTime
      *
+     * @Assert\DateTime()
      * @ORM\Column(name="start", type="datetime")
      */
     private $start;
@@ -38,6 +42,7 @@ class Event
     /**
      * @var \DateTime
      *
+     * @Assert\DateTime()
      * @ORM\Column(name="end", type="datetime", nullable=true)
      */
     private $end;
@@ -125,4 +130,3 @@ class Event
         return $this->end;
     }
 }
-

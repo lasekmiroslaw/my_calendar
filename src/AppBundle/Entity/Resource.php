@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Resource
@@ -30,6 +31,8 @@ class Resource
     /**
      * @var string
      *
+     * @Assert\NotBlank()
+     * @Assert\Type("string")        
      * @ORM\Column(name="title", type="string", length=255)
      */
     private $title;

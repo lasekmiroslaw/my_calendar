@@ -22,3 +22,8 @@ github_login:
 
 googleplus_login:
     path: /connect/check-googleplus
+
+api:
+    type: rest
+    prefix: /api
+    resource: "routing_api.yml"
