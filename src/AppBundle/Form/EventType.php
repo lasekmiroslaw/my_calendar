@@ -2,7 +2,7 @@
 
 namespace AppBundle\Form;
 
-use App\Entity\Event;
+use AppBundle\Entity\Event;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,13 +15,11 @@ class EventType extends AbstractType
     {
         $builder
             ->add('title')
-            ->add(
-                'start',
+            ->add('start',
                 DateTimeType::class,
                 [
                     'widget'        => 'single_text',
-                    'format'        => 'yyyy-MM-dd\'T\'HH:mm:ssZZZZZ',
-                    'property_path' => 'releaseDate',
+                    'format'        => 'yyyy-MM-dd\'T\'HH:mm:ss',
                 ]
             )
             ->add(
@@ -29,8 +27,7 @@ class EventType extends AbstractType
                 DateTimeType::class,
                 [
                     'widget'        => 'single_text',
-                    'format'        => 'yyyy-MM-dd\'T\'HH:mm:ssZZZZZ',
-                    'property_path' => 'releaseDate',
+                    'format'        => 'yyyy-MM-dd\'T\'HH:mm:ss',
                 ]
             );
     }

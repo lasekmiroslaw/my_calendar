@@ -35,6 +35,7 @@ class Event
      * @var \DateTime
      *
      * @Assert\DateTime()
+     * @Assert\NotBlank()
      * @ORM\Column(name="start", type="datetime")
      */
     private $start;
@@ -47,6 +48,11 @@ class Event
      */
     private $end;
 
+    /**
+    * @ORM\ManyToOne(targetEntity="AppBundle\Entity\User")
+    * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+    */
+    private $user;
 
     /**
      * Get id
@@ -129,4 +135,24 @@ class Event
     {
         return $this->end;
     }
+
+    /**
+     * Get the value of userId
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * Set the value of userId
+     *
+     * @return  self
+     */
+    public function setUser(User $user)
+    {
+        $this->user = $user;
+
+        return $this;
+    }    
 }

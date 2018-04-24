@@ -1,6 +1,7 @@
 <?php
 
 namespace AppBundle\Repository;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * EventRepository
@@ -10,4 +11,16 @@ namespace AppBundle\Repository;
  */
 class EventRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function getEvent(string $id)
+    {
+        $event = $this->find($id);
+
+        if (null === $event) {
+            throw new NotFoundHttpException(
+            'No event found for id '.$id
+        );
+        }
+
+        return $event;
+    }
 }

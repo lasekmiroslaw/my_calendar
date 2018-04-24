@@ -32,7 +32,7 @@ class Resource
      * @var string
      *
      * @Assert\NotBlank()
-     * @Assert\Type("string")        
+     * @Assert\Type("string")
      * @ORM\Column(name="title", type="string", length=255)
      */
     private $title;
@@ -49,6 +49,12 @@ class Resource
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
      */
     private $parent;
+
+    /**
+    * @ORM\ManyToOne(targetEntity="AppBundle\Entity\User")
+    * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+    */
+    private $user;
 
     public function __construct()
     {
@@ -145,5 +151,25 @@ class Resource
     public function getParent()
     {
         return $this->parent;
+    }
+
+    /**
+     * Get the value of userId
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * Set the value of userId
+     *
+     * @return  self
+     */
+    public function setUser(User $user)
+    {
+        $this->user = $user;
+
+        return $this;
     }
 }

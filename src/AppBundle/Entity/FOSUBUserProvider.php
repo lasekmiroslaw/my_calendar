@@ -1,6 +1,5 @@
 <?php
 
-// Change the namespace according to your project.
 namespace AppBundle\Entity;
 
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
@@ -37,7 +36,6 @@ class FOSUBUserProvider extends BaseClass
 
     public function loadUserByOAuthUserResponse(UserResponseInterface $response)
     {
-        // dump($response);die;
         $username = $response->getUsername();
         $email = $response->getEmail();
 

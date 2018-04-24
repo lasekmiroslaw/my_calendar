@@ -11,7 +11,6 @@ use FOS\RestBundle\Controller\Annotations\View;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-
 class EventController extends FOSRestController implements ClassResourceInterface
 {
     /**
@@ -19,42 +18,55 @@ class EventController extends FOSRestController implements ClassResourceInterfac
      */
     private $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager) {
+    public function __construct(EntityManagerInterface $entityManager)
+    {
         $this->entityManager = $entityManager;
     }
 
+    /**
+     * @View(statusCode=201)
+     */
     public function postAction(Request $request)
     {
-        $form = $this->createForm(EventType::class, new Event());
-
+        $event = new Event();
+        $event->setUser($this->getUser());
+        $form = $this->createForm(EventType::class, $event);
         $form->submit($request->request->all());
 
         if (false === $form->isValid()) {
-            return $this->handleView(
-                $this->view($form)
-            );
+            return $form;
         }
 
-        $this->entityManager->persist($form->getData());
+        $this->entityManager->persist($event);
         $this->entityManager->flush();
 
-        return $this->handleView(
-            $this->view(
-                [
-                    'status' => 'ok',
-                ],
-                Response::HTTP_CREATED
-            )
-        );
+        return  $event;
     }
 
     /**
      * @View()
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function putAction($id, Request $request)
+    {
+        $event = $this->getDoctrine()->getRepository(Event::class)->getEvent($id);
+        $form = $this->createForm(EventType::class, $event);
+        $form->submit($request->request->all());
+
+        if (false === $form->isValid()) {
+            return $form;
+        }
+
+        $this->entityManager->flush();
+
+        return  $event;
+    }
+
+    /**
+     * @View()
      */
     public function getAction($id)
     {
-        return $this->findEventById($id);
+        return $this->getDoctrine()->getRepository(Event::class)->getEvent($id);
     }
 
     /**
@@ -63,24 +75,5 @@ class EventController extends FOSRestController implements ClassResourceInterfac
     public function cgetAction()
     {
         return ['events' => $this->getDoctrine()->getRepository(Event::class)->findAll()];
-    }
-
-    /**
-     * @param string $id
-     *
-     * @return Album
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    private function findEventById(string $id)
-    {
-        $event = $this->getDoctrine()->getRepository(Event::class)->find($id);
-
-        if (null === $event) {
-          throw $this->createNotFoundException(
-              'No event found for id '.$id
-          );
-        }
-
-        return $event;
     }
 }
