@@ -55,26 +55,6 @@ class User extends BaseUser
         return $this->github_access_token;
     }
 
-    public function setFacebookId($facebookID) {
-        $this->facebook_id = $facebookID;
-
-        return $this;
-    }
-
-    public function getFacebookId() {
-        return $this->facebook_id;
-    }
-
-    public function setFacebookAccessToken($facebookAccessToken) {
-        $this->facebook_access_token = $facebookAccessToken;
-
-        return $this;
-    }
-
-    public function getFacebookAccessToken() {
-        return $this->facebook_access_token;
-    }
-
     public function setGoogleplusId($googlePlusId) {
         $this->googleplus_id = $googlePlusId;
 

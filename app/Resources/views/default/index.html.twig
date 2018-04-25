@@ -2,12 +2,32 @@
 {% block title %}Welcome to my calendar{% endblock %}
 {% block stylesheets %}
   <link rel='stylesheet' href='build/fullcalendar.css'/>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
 {% endblock %}
 
 {% block body %}
-  <p>Hello Symfony</p>
+  <p id="hello">Hello Symfony</p>
+<div id="ex1" class="modal">
+  <h3>Add event</h3>
+  <form id="event-form">
+    <div class="input-group">
+        <label for="title">title</label>
+        <input class="form-control" id="title" type="text" name="" value="">
+    </div>
+    <div class="input-group">
+      <label for="start">start</label>
+      <input class="form-control" id="start" type="datetime" name="" value="">
+    </div>
+    <div class="input-group">
+      <label for="end">end</label>
+      <input class="form-control" id="end" type="datetime" name="" value="">
+    </div>
+    <input type="submit" value="add">
+  </form>
+</div>
+
+
   <div id='calendar'></div>
 {% endblock %}
 

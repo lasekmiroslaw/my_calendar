@@ -1,6 +1,7 @@
 <?php
 
 namespace AppBundle\Repository;
+
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -11,16 +12,68 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class EventRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function getEvent(string $id)
+    public function findUserEvent(string $id, int $userId)
     {
-        $event = $this->find($id);
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+          'SELECT e.title, e.start, e.end
+          FROM AppBundle\Entity\Event e
+          WHERE e.id = :id
+          AND e.user = :userId'
+        )->setParameter('id', $id)
+        ->setParameter('userId', $userId);
+
+        $event = $query->getOneOrNullResult();
 
         if (null === $event) {
             throw new NotFoundHttpException(
             'No event found for id '.$id
-        );
+            );
         }
 
         return $event;
+    }
+
+    public function getUserEvent(string $id, int $userId)
+    {
+        $event = $this->findOneBy([
+           'id' => $id,
+           'user' => $userId
+         ]);
+
+        if (null === $event) {
+            throw new NotFoundHttpException(
+            'No event found for id '.$id
+            );
+        }
+
+        return $event;
+    }
+
+    public function findUserEvents(int $userId)
+    {
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+          'SELECT e.id, e.title, e.start, e.end
+          FROM AppBundle\Entity\Event e
+          WHERE e.user = :userId'
+      )->setParameter('userId', $userId);
+
+        return $query->execute();
+    }
+
+    public function findAllByUser(int $userId)
+    {
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+          'SELECT e.title, e.start, e.end
+          FROM AppBundle\Entity\Event e
+          WHERE e.user = :userId'
+      )->setParameter('userId', $userId);
+
+        return $query->execute();
     }
 }

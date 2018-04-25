@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Event
@@ -19,6 +20,7 @@ class Event
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Groups({"default"})
      */
     private $id;
 
@@ -28,6 +30,7 @@ class Event
      * @Assert\NotBlank()
      * @Assert\Type("string")
      * @ORM\Column(name="title", type="string", length=255)
+     * @Groups({"default"})
      */
     private $title;
 
@@ -37,6 +40,7 @@ class Event
      * @Assert\DateTime()
      * @Assert\NotBlank()
      * @ORM\Column(name="start", type="datetime")
+     * @Groups({"default"})
      */
     private $start;
 
@@ -45,6 +49,7 @@ class Event
      *
      * @Assert\DateTime()
      * @ORM\Column(name="end", type="datetime", nullable=true)
+     * @Groups({"default"})
      */
     private $end;
 
@@ -154,5 +159,5 @@ class Event
         $this->user = $user;
 
         return $this;
-    }    
+    }
 }

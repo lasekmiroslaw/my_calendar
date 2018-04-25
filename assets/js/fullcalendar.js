@@ -1,45 +1,69 @@
 require('../css/fullcalendar.css');
 require('../css/scheduler.css');
+require('../css/scheduler.css');
+require('../css/jquery.modal.min.css');
 import $ from 'jquery';
+import 'jquery-modal';
 import 'fullcalendar';
 import 'fullcalendar-scheduler';
 
-$('#calendar').fullCalendar({
-    header: { center: 'month,agendaWeek,timelineDay' }, // buttons for switching between views
-    themeSystem: 'bootstrap4',
-    events: [
-      {
-        id: '1',
-        title  : 'event1',
-        start  : '2018-04-21'
-      },
-      {
-        id: '2',
-        title  : 'event2',
-        start  : '2018-04-11',
-        end    : '2018-04-15'
-      },
-      {
-        title  : 'event3',
-        start  : '2018-04-21T18:30:00',
-        allDay : false // will make the time show
-      }
-    ],
-    resources: [
-      {
-        id: '1',
-        title: 'Room A'
-      },
-      {
-        id: '2',
-        title: 'Room B'
-      }
-    ]
-});
-var calendar = $('#calendar').fullCalendar('getCalendar');
+const HOST = 'http://my-calendar.com'
+var events = [];
 
-$(function() {
-  calendar.on('dayClick', function(date, jsEvent, view) {
-    calendar.changeView('timelineDay', date)
-  });
+const getEvents = fetch(HOST + '/api/events', {
+  headers: {
+    Accept: 'application/json'
+  },
+  credentials: 'same-origin'
+}).then((response) => response.json()).then((json) => {
+  events = json.events;
 });
+getEvents.then(showCalendar);
+
+function showCalendar() {
+  $('#calendar').fullCalendar({
+    schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
+    header: {
+      center: 'month,agendaWeek'
+    }, // buttons for switching between views
+    themeSystem: 'bootstrap4',
+    selectable: true,
+    editable: true,
+    selectHelper: true,
+    select: function(start, end) {
+      $('#start').val(start.format('YYYY-MM-DDTHH:mm:ss'))
+      $('#end').val(end.format('YYYY-MM-DDTHH:mm:ss'))
+      $('#ex1').modal()
+      console.log(start.format('YYYY-MM-DD HH:mm:ss'))
+      console.log(end.format('YYYY-MM-DD HH:mm:ss'))
+
+    },
+
+    events: events
+  });
+}
+
+$('#event-form').submit(addEvent)
+
+function addEvent(e) {
+  e.preventDefault();
+  const event = {
+    'title': $('#title').val(),
+    'start': $('#start').val(),
+    'end': $('#end').val()
+  };
+  const calendar = $('#calendar').fullCalendar('getCalendar');
+
+  console.log(event)
+  fetch(HOST + '/api/events', {
+    method: 'post',
+    headers: {
+      Accept: 'application/json',
+      "Content-type": 'application/json'
+    },
+    credentials: 'same-origin',
+    body: JSON.stringify(event)
+  }).then((response) => response.json()).then((json) => {
+    calendar.renderEvent(json)
+  });
+}

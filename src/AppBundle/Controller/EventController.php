@@ -24,12 +24,13 @@ class EventController extends FOSRestController implements ClassResourceInterfac
     }
 
     /**
-     * @View(statusCode=201)
+     * @View(statusCode=201, serializerGroups={"default"})
      */
     public function postAction(Request $request)
     {
         $event = new Event();
         $event->setUser($this->getUser());
+
         $form = $this->createForm(EventType::class, $event);
         $form->submit($request->request->all());
 
@@ -44,11 +45,13 @@ class EventController extends FOSRestController implements ClassResourceInterfac
     }
 
     /**
-     * @View()
+     * @View(serializerGroups={"default"})
      */
     public function putAction($id, Request $request)
     {
-        $event = $this->getDoctrine()->getRepository(Event::class)->getEvent($id);
+        $event = $this->getDoctrine()->getRepository(Event::class)
+            ->getUserEvent($id, $this->getUser()->getId());
+
         $form = $this->createForm(EventType::class, $event);
         $form->submit($request->request->all());
 
@@ -66,7 +69,8 @@ class EventController extends FOSRestController implements ClassResourceInterfac
      */
     public function getAction($id)
     {
-        return $this->getDoctrine()->getRepository(Event::class)->getEvent($id);
+        return $this->getDoctrine()->getRepository(Event::class)
+            ->findUserEvent($id, $this->getUser()->getId());
     }
 
     /**
@@ -74,6 +78,9 @@ class EventController extends FOSRestController implements ClassResourceInterfac
      */
     public function cgetAction()
     {
-        return ['events' => $this->getDoctrine()->getRepository(Event::class)->findAll()];
+        return [
+          'events' => $this->getDoctrine()->getRepository(Event::class)
+              ->findUserEvents($this->getUser()->getId())
+          ];
     }
 }

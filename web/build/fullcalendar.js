@@ -77,6 +77,18 @@
 
 /***/ }),
 
+/***/ "./assets/css/jquery.modal.min.css":
+/*!*****************************************!*\
+  !*** ./assets/css/jquery.modal.min.css ***!
+  \*****************************************/
+/*! dynamic exports provided */
+/*! all exports used */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+
 /***/ "./assets/css/scheduler.css":
 /*!**********************************!*\
   !*** ./assets/css/scheduler.css ***!
@@ -101,48 +113,84 @@
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fullcalendar__ = __webpack_require__(/*! fullcalendar */ "./node_modules/fullcalendar/dist/fullcalendar.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fullcalendar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_fullcalendar__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_fullcalendar_scheduler__ = __webpack_require__(/*! fullcalendar-scheduler */ "./node_modules/fullcalendar-scheduler/dist/scheduler.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_fullcalendar_scheduler___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_fullcalendar_scheduler__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery_modal__ = __webpack_require__(/*! jquery-modal */ "./node_modules/jquery-modal/jquery.modal.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery_modal___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_jquery_modal__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_fullcalendar__ = __webpack_require__(/*! fullcalendar */ "./node_modules/fullcalendar/dist/fullcalendar.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_fullcalendar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_fullcalendar__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_fullcalendar_scheduler__ = __webpack_require__(/*! fullcalendar-scheduler */ "./node_modules/fullcalendar-scheduler/dist/scheduler.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_fullcalendar_scheduler___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_fullcalendar_scheduler__);
 __webpack_require__(/*! ../css/fullcalendar.css */ "./assets/css/fullcalendar.css");
 __webpack_require__(/*! ../css/scheduler.css */ "./assets/css/scheduler.css");
+__webpack_require__(/*! ../css/scheduler.css */ "./assets/css/scheduler.css");
+__webpack_require__(/*! ../css/jquery.modal.min.css */ "./assets/css/jquery.modal.min.css");
 
 
 
 
-__WEBPACK_IMPORTED_MODULE_0_jquery___default()('#calendar').fullCalendar({
-  header: { center: 'month,agendaWeek,timelineDay' }, // buttons for switching between views
-  themeSystem: 'bootstrap4',
-  events: [{
-    id: '1',
-    title: 'event1',
-    start: '2018-04-21'
-  }, {
-    id: '2',
-    title: 'event2',
-    start: '2018-04-11',
-    end: '2018-04-15'
-  }, {
-    title: 'event3',
-    start: '2018-04-21T18:30:00',
-    allDay: false // will make the time show
-  }],
-  resources: [{
-    id: '1',
-    title: 'Room A'
-  }, {
-    id: '2',
-    title: 'Room B'
-  }]
+
+var HOST = 'http://my-calendar.com';
+var events = [];
+
+var getEvents = fetch(HOST + '/api/events', {
+  headers: {
+    Accept: 'application/json'
+  },
+  credentials: 'same-origin'
+}).then(function (response) {
+  return response.json();
+}).then(function (json) {
+  events = json.events;
 });
-var calendar = __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#calendar').fullCalendar('getCalendar');
+getEvents.then(showCalendar);
 
-__WEBPACK_IMPORTED_MODULE_0_jquery___default()(function () {
-  calendar.on('dayClick', function (date, jsEvent, view) {
-    calendar.changeView('timelineDay', date);
+function showCalendar() {
+  __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#calendar').fullCalendar({
+    schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
+    header: {
+      center: 'month,agendaWeek'
+    }, // buttons for switching between views
+    themeSystem: 'bootstrap4',
+    selectable: true,
+    editable: true,
+    selectHelper: true,
+    select: function select(start, end) {
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#start').val(start.format('YYYY-MM-DDTHH:mm:ss'));
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#end').val(end.format('YYYY-MM-DDTHH:mm:ss'));
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#ex1').modal();
+      console.log(start.format('YYYY-MM-DD HH:mm:ss'));
+      console.log(end.format('YYYY-MM-DD HH:mm:ss'));
+    },
+
+    events: events
   });
-});
+}
+
+__WEBPACK_IMPORTED_MODULE_0_jquery___default()('#event-form').submit(addEvent);
+
+function addEvent(e) {
+  e.preventDefault();
+  var event = {
+    'title': __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#title').val(),
+    'start': __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#start').val(),
+    'end': __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#end').val()
+  };
+  var calendar = __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#calendar').fullCalendar('getCalendar');
+
+  console.log(event);
+  fetch(HOST + '/api/events', {
+    method: 'post',
+    headers: {
+      Accept: 'application/json',
+      "Content-type": 'application/json'
+    },
+    credentials: 'same-origin',
+    body: JSON.stringify(event)
+  }).then(function (response) {
+    return response.json();
+  }).then(function (json) {
+    calendar.renderEvent(json);
+  });
+}
 
 /***/ }),
 
@@ -21512,6 +21560,262 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /***/ })
 /******/ ]);
 });
+
+/***/ }),
+
+/***/ "./node_modules/jquery-modal/jquery.modal.js":
+/*!***************************************************!*\
+  !*** ./node_modules/jquery-modal/jquery.modal.js ***!
+  \***************************************************/
+/*! dynamic exports provided */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/*
+    A simple jQuery modal (http://github.com/kylefox/jquery-modal)
+    Version 0.9.1
+*/
+
+(function (factory) {
+  // Making your jQuery plugin work better with npm tools
+  // http://blog.npmjs.org/post/112712169830/making-your-jquery-plugin-work-better-with-npm
+  if(typeof module === "object" && typeof module.exports === "object") {
+    factory(__webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js"), window, document);
+  }
+  else {
+    factory(jQuery, window, document);
+  }
+}(function($, window, document, undefined) {
+
+  var modals = [],
+      getCurrent = function() {
+        return modals.length ? modals[modals.length - 1] : null;
+      },
+      selectCurrent = function() {
+        var i,
+            selected = false;
+        for (i=modals.length-1; i>=0; i--) {
+          if (modals[i].$blocker) {
+            modals[i].$blocker.toggleClass('current',!selected).toggleClass('behind',selected);
+            selected = true;
+          }
+        }
+      };
+
+  $.modal = function(el, options) {
+    var remove, target;
+    this.$body = $('body');
+    this.options = $.extend({}, $.modal.defaults, options);
+    this.options.doFade = !isNaN(parseInt(this.options.fadeDuration, 10));
+    this.$blocker = null;
+    if (this.options.closeExisting)
+      while ($.modal.isActive())
+        $.modal.close(); // Close any open modals.
+    modals.push(this);
+    if (el.is('a')) {
+      target = el.attr('href');
+      this.anchor = el;
+      //Select element by id from href
+      if (/^#/.test(target)) {
+        this.$elm = $(target);
+        if (this.$elm.length !== 1) return null;
+        this.$body.append(this.$elm);
+        this.open();
+      //AJAX
+      } else {
+        this.$elm = $('<div>');
+        this.$body.append(this.$elm);
+        remove = function(event, modal) { modal.elm.remove(); };
+        this.showSpinner();
+        el.trigger($.modal.AJAX_SEND);
+        $.get(target).done(function(html) {
+          if (!$.modal.isActive()) return;
+          el.trigger($.modal.AJAX_SUCCESS);
+          var current = getCurrent();
+          current.$elm.empty().append(html).on($.modal.CLOSE, remove);
+          current.hideSpinner();
+          current.open();
+          el.trigger($.modal.AJAX_COMPLETE);
+        }).fail(function() {
+          el.trigger($.modal.AJAX_FAIL);
+          var current = getCurrent();
+          current.hideSpinner();
+          modals.pop(); // remove expected modal from the list
+          el.trigger($.modal.AJAX_COMPLETE);
+        });
+      }
+    } else {
+      this.$elm = el;
+      this.anchor = el;
+      this.$body.append(this.$elm);
+      this.open();
+    }
+  };
+
+  $.modal.prototype = {
+    constructor: $.modal,
+
+    open: function() {
+      var m = this;
+      this.block();
+      this.anchor.blur();
+      if(this.options.doFade) {
+        setTimeout(function() {
+          m.show();
+        }, this.options.fadeDuration * this.options.fadeDelay);
+      } else {
+        this.show();
+      }
+      $(document).off('keydown.modal').on('keydown.modal', function(event) {
+        var current = getCurrent();
+        if (event.which === 27 && current.options.escapeClose) current.close();
+      });
+      if (this.options.clickClose)
+        this.$blocker.click(function(e) {
+          if (e.target === this)
+            $.modal.close();
+        });
+    },
+
+    close: function() {
+      modals.pop();
+      this.unblock();
+      this.hide();
+      if (!$.modal.isActive())
+        $(document).off('keydown.modal');
+    },
+
+    block: function() {
+      this.$elm.trigger($.modal.BEFORE_BLOCK, [this._ctx()]);
+      this.$body.css('overflow','hidden');
+      this.$blocker = $('<div class="' + this.options.blockerClass + ' blocker current"></div>').appendTo(this.$body);
+      selectCurrent();
+      if(this.options.doFade) {
+        this.$blocker.css('opacity',0).animate({opacity: 1}, this.options.fadeDuration);
+      }
+      this.$elm.trigger($.modal.BLOCK, [this._ctx()]);
+    },
+
+    unblock: function(now) {
+      if (!now && this.options.doFade)
+        this.$blocker.fadeOut(this.options.fadeDuration, this.unblock.bind(this,true));
+      else {
+        this.$blocker.children().appendTo(this.$body);
+        this.$blocker.remove();
+        this.$blocker = null;
+        selectCurrent();
+        if (!$.modal.isActive())
+          this.$body.css('overflow','');
+      }
+    },
+
+    show: function() {
+      this.$elm.trigger($.modal.BEFORE_OPEN, [this._ctx()]);
+      if (this.options.showClose) {
+        this.closeButton = $('<a href="#close-modal" rel="modal:close" class="close-modal ' + this.options.closeClass + '">' + this.options.closeText + '</a>');
+        this.$elm.append(this.closeButton);
+      }
+      this.$elm.addClass(this.options.modalClass).appendTo(this.$blocker);
+      if(this.options.doFade) {
+        this.$elm.css({opacity: 0, display: 'inline-block'}).animate({opacity: 1}, this.options.fadeDuration);
+      } else {
+        this.$elm.css('display', 'inline-block');
+      }
+      this.$elm.trigger($.modal.OPEN, [this._ctx()]);
+    },
+
+    hide: function() {
+      this.$elm.trigger($.modal.BEFORE_CLOSE, [this._ctx()]);
+      if (this.closeButton) this.closeButton.remove();
+      var _this = this;
+      if(this.options.doFade) {
+        this.$elm.fadeOut(this.options.fadeDuration, function () {
+          _this.$elm.trigger($.modal.AFTER_CLOSE, [_this._ctx()]);
+        });
+      } else {
+        this.$elm.hide(0, function () {
+          _this.$elm.trigger($.modal.AFTER_CLOSE, [_this._ctx()]);
+        });
+      }
+      this.$elm.trigger($.modal.CLOSE, [this._ctx()]);
+    },
+
+    showSpinner: function() {
+      if (!this.options.showSpinner) return;
+      this.spinner = this.spinner || $('<div class="' + this.options.modalClass + '-spinner"></div>')
+        .append(this.options.spinnerHtml);
+      this.$body.append(this.spinner);
+      this.spinner.show();
+    },
+
+    hideSpinner: function() {
+      if (this.spinner) this.spinner.remove();
+    },
+
+    //Return context for custom events
+    _ctx: function() {
+      return { elm: this.$elm, $elm: this.$elm, $blocker: this.$blocker, options: this.options };
+    }
+  };
+
+  $.modal.close = function(event) {
+    if (!$.modal.isActive()) return;
+    if (event) event.preventDefault();
+    var current = getCurrent();
+    current.close();
+    return current.$elm;
+  };
+
+  // Returns if there currently is an active modal
+  $.modal.isActive = function () {
+    return modals.length > 0;
+  };
+
+  $.modal.getCurrent = getCurrent;
+
+  $.modal.defaults = {
+    closeExisting: true,
+    escapeClose: true,
+    clickClose: true,
+    closeText: 'Close',
+    closeClass: '',
+    modalClass: "modal",
+    blockerClass: "jquery-modal",
+    spinnerHtml: '<div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div>',
+    showSpinner: true,
+    showClose: true,
+    fadeDuration: null,   // Number of milliseconds the fade animation takes.
+    fadeDelay: 1.0        // Point during the overlay's fade-in that the modal begins to fade in (.5 = 50%, 1.5 = 150%, etc.)
+  };
+
+  // Event constants
+  $.modal.BEFORE_BLOCK = 'modal:before-block';
+  $.modal.BLOCK = 'modal:block';
+  $.modal.BEFORE_OPEN = 'modal:before-open';
+  $.modal.OPEN = 'modal:open';
+  $.modal.BEFORE_CLOSE = 'modal:before-close';
+  $.modal.CLOSE = 'modal:close';
+  $.modal.AFTER_CLOSE = 'modal:after-close';
+  $.modal.AJAX_SEND = 'modal:ajax:send';
+  $.modal.AJAX_SUCCESS = 'modal:ajax:success';
+  $.modal.AJAX_FAIL = 'modal:ajax:fail';
+  $.modal.AJAX_COMPLETE = 'modal:ajax:complete';
+
+  $.fn.modal = function(options){
+    if (this.length === 1) {
+      new $.modal(this, options);
+    }
+    return this;
+  };
+
+  // Automatically bind links with rel="modal:close" to, well, close the modal.
+  $(document).on('click.modal', 'a[rel~="modal:close"]', $.modal.close);
+  $(document).on('click.modal', 'a[rel~="modal:open"]', function(event) {
+    event.preventDefault();
+    $(this).modal();
+  });
+}));
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js")))
 
 /***/ }),
 

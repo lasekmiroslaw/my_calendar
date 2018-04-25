@@ -11,7 +11,13 @@ security:
             id: fos_user.user_provider.username_email
     firewalls:
         main:
-            anonymous: true          
+            remember_me:
+                secret: '%secret%'
+                lifetime: 31536000 # 365 days in seconds
+                path: /
+                domain: ~ # Defaults to the current domain from $_SERVER
+                always_remember_me: true
+                remember_me_parameter: _remember_me
             pattern: ^/
             form_login:
                 provider: fos_userbundle
@@ -28,7 +34,13 @@ security:
                 oauth_user_provider:
                     service: app.fos_user.oauth_provider
             logout: true
+            anonymous: true
             logout_on_user_change: true
+
+        login:
+            pattern:  ^/login$
+            security: false
+
     access_control:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
