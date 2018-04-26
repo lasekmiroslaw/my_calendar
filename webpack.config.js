@@ -8,9 +8,7 @@ Encore
     .setPublicPath('/build')
 
     // will create web/build/app.js and web/build/app.css
-    .addEntry('app', './assets/js/app.js')
     .addEntry('fullcalendar', './assets/js/fullcalendar.js')
-    .addEntry('gcal', './assets/js/gcal.js')
 
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()

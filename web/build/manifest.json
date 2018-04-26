@@ -1,6 +1,4 @@
 {
   "build/fullcalendar.js": "/build/fullcalendar.js",
-  "build/fullcalendar.css": "/build/fullcalendar.css",
-  "build/gcal.js": "/build/gcal.js",
-  "build/app.js": "/build/app.js"
+  "build/fullcalendar.css": "/build/fullcalendar.css"
 }

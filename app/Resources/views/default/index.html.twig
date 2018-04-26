@@ -7,31 +7,46 @@
 {% endblock %}
 
 {% block body %}
-  <p id="hello">Hello Symfony</p>
-<div id="ex1" class="modal">
-  <h3>Add event</h3>
-  <form id="event-form">
-    <div class="input-group">
-        <label for="title">title</label>
-        <input class="form-control" id="title" type="text" name="" value="">
+
+<div id="modal-new-event" class="modal mx-auto col-md-4">
+  <h3 class="text-center">Add event</h3>
+  <button class="btn btn-danger" id="delete-btn">Delete</button>
+  <form class="p-5" id="event-form">
+
+    <div class="form-group has-danger">
+        <label class="" for="title">title</label>
+        <input class="form-control" id="title" type="text" value="">
+        <div class="error-title text-danger"></div>
     </div>
-    <div class="input-group">
-      <label for="start">start</label>
-      <input class="form-control" id="start" type="datetime" name="" value="">
+
+    <div class="form-group">
+      <label class="" for="start">start</label>
+      <input class="form-control" id="start" type="datetime-local">
+      <div class="error-start text-danger"></div>
     </div>
-    <div class="input-group">
-      <label for="end">end</label>
-      <input class="form-control" id="end" type="datetime" name="" value="">
+    <div class="form-group">
+      <label class="" for="end">end</label>
+      <input class="form-control" id="end" type="datetime-local" value="">
+      <div class="error-end text-danger"></div>
     </div>
-    <input type="submit" value="add">
+
+    <input class="btn btn-primary" type="submit" value="save event">
   </form>
 </div>
 
+<div id="modal-show-event" class="modal mx-auto col-md-4">
+  <h3 class="event-title text-center"></h3>
+  <div><p>start at <span class="event-start"></span></p>
+  </div>
+  <div class="">
+    <p>end at <span class="event-end"></p>
+  </div>
+  <button id="edit-btn" class="btn btn-primary">Edit</button>
+</div>
 
   <div id='calendar'></div>
 {% endblock %}
 
 {% block javascripts %}
   <script src="{{ asset('build/fullcalendar.js') }}"></script>
-  <script src="{{ asset('build/gcal.js') }}"></script>
 {% endblock %}

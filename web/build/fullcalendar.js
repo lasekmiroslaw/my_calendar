@@ -65,6 +65,18 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./assets/css/app.css":
+/*!****************************!*\
+  !*** ./assets/css/app.css ***!
+  \****************************/
+/*! dynamic exports provided */
+/*! all exports used */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+
 /***/ "./assets/css/fullcalendar.css":
 /*!*************************************!*\
   !*** ./assets/css/fullcalendar.css ***!
@@ -119,10 +131,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_fullcalendar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_fullcalendar__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_fullcalendar_scheduler__ = __webpack_require__(/*! fullcalendar-scheduler */ "./node_modules/fullcalendar-scheduler/dist/scheduler.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_fullcalendar_scheduler___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_fullcalendar_scheduler__);
+__webpack_require__(/*! ../css/jquery.modal.min.css */ "./assets/css/jquery.modal.min.css");
 __webpack_require__(/*! ../css/fullcalendar.css */ "./assets/css/fullcalendar.css");
 __webpack_require__(/*! ../css/scheduler.css */ "./assets/css/scheduler.css");
-__webpack_require__(/*! ../css/scheduler.css */ "./assets/css/scheduler.css");
-__webpack_require__(/*! ../css/jquery.modal.min.css */ "./assets/css/jquery.modal.min.css");
+__webpack_require__(/*! ../css/app.css */ "./assets/css/app.css");
 
 
 
@@ -130,6 +142,7 @@ __webpack_require__(/*! ../css/jquery.modal.min.css */ "./assets/css/jquery.moda
 
 var HOST = 'http://my-calendar.com';
 var events = [];
+var properties = ['title', 'start', 'end'];
 
 var getEvents = fetch(HOST + '/api/events', {
   headers: {
@@ -140,6 +153,8 @@ var getEvents = fetch(HOST + '/api/events', {
   return response.json();
 }).then(function (json) {
   events = json.events;
+}).catch(function (err) {
+  return console.log(err);
 });
 getEvents.then(showCalendar);
 
@@ -153,19 +168,46 @@ function showCalendar() {
     selectable: true,
     editable: true,
     selectHelper: true,
+    events: events,
     select: function select(start, end) {
-      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#start').val(start.format('YYYY-MM-DDTHH:mm:ss'));
-      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#end').val(end.format('YYYY-MM-DDTHH:mm:ss'));
-      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#ex1').modal();
-      console.log(start.format('YYYY-MM-DD HH:mm:ss'));
-      console.log(end.format('YYYY-MM-DD HH:mm:ss'));
-    },
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#delete-btn').addClass('d-none');
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#start').val(start.format('YYYY-MM-DD[T]HH:mm'));
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#end').val(end.format('YYYY-MM-DD[T]HH:mm'));
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#title').val('');
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#modal-new-event').modal({
+        showClose: false
+      });
 
-    events: events
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#event-form').off();
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#event-form').submit(addEvent);
+    },
+    eventClick: function eventClick(calEvent) {
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#delete-btn').removeClass('d-none');
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#event-form').off();
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#event-form').on('submit', { calEvent: calEvent }, editEvent);
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#delete-btn').off();
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#delete-btn').on('click', { id: calEvent.id }, deleteEvent);
+
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#modal-show-event').modal({
+        showClose: false
+      });
+      showPropertiesValue(calEvent);
+
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#edit-btn').click(function () {
+        __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#start').val(calEvent.start.format('YYYY-MM-DD[T]HH:mm'));
+        __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#title').val(calEvent.title);
+        if (calEvent.end) __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#end').val(calEvent.end.format('YYYY-MM-DD[T]HH:mm'));
+
+        __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#modal-new-event').modal({
+          showClose: false
+        });
+      });
+    },
+    eventDrop: function eventDrop(event, delta, revertFunc) {
+      moveEvent(event, revertFunc);
+    }
   });
 }
-
-__WEBPACK_IMPORTED_MODULE_0_jquery___default()('#event-form').submit(addEvent);
 
 function addEvent(e) {
   e.preventDefault();
@@ -174,9 +216,7 @@ function addEvent(e) {
     'start': __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#start').val(),
     'end': __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#end').val()
   };
-  var calendar = __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#calendar').fullCalendar('getCalendar');
 
-  console.log(event);
   fetch(HOST + '/api/events', {
     method: 'post',
     headers: {
@@ -186,9 +226,131 @@ function addEvent(e) {
     credentials: 'same-origin',
     body: JSON.stringify(event)
   }).then(function (response) {
-    return response.json();
+    if (response.status === 400 || response.status === 201) {
+      return response.json();
+    }
   }).then(function (json) {
-    calendar.renderEvent(json);
+    if (json.message === 'Validation Failed') {
+      showValidationErrors(json.errors.children);
+    } else {
+      var calendar = __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#calendar').fullCalendar('getCalendar');
+      calendar.renderEvent(json);
+
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.modal.close();
+    }
+  }).catch(function (err) {
+    console.log(err);
+  });
+}
+
+function showValidationErrors(properties) {
+  for (var property in properties) {
+    var object = properties[property];
+    if (!object.hasOwnProperty('errors')) continue;
+
+    __WEBPACK_IMPORTED_MODULE_0_jquery___default()('.error-' + property).text(object['errors']);
+  }
+}
+
+function showPropertiesValue(values) {
+  properties.forEach(function (property) {
+    var propertyArr = [];
+    propertyArr[property] = values[property];
+    if (values[property] instanceof Object) {
+      propertyArr[property] = values[property].calendar();
+    }
+    __WEBPACK_IMPORTED_MODULE_0_jquery___default()('.event-' + property).text(propertyArr[property]);
+  });
+}
+
+__WEBPACK_IMPORTED_MODULE_0_jquery___default()('#modal').on(__WEBPACK_IMPORTED_MODULE_0_jquery___default.a.modal.AFTER_CLOSE, function () {
+  properties.forEach(function (property) {
+    __WEBPACK_IMPORTED_MODULE_0_jquery___default()('.error-' + property).text('');
+  });
+});
+
+function moveEvent(calEvent, revertFunc) {
+  var event = {
+    'title': calEvent.title,
+    'start': calEvent.start,
+    'end': calEvent.end
+  };
+  fetch(HOST + '/api/events/' + calEvent.id, {
+    method: 'put',
+    headers: {
+      Accept: 'application/json',
+      "Content-type": 'application/json'
+    },
+    credentials: 'same-origin',
+    body: JSON.stringify(event)
+  }).then(function (response) {
+    if (response.status === 400 || response.status === 200) {
+      return response.json();
+    }
+  }).then(function (json) {
+    if (json.message === 'Validation Failed') {
+      revertFunc();
+    }
+    console.log(json);
+  }).catch(function (err) {
+    console.log(err);
+    revertFunc();
+  });
+}
+
+function editEvent(e) {
+  e.stopPropagation();
+  var event = {
+    'title': __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#title').val(),
+    'start': __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#start').val(),
+    'end': __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#end').val()
+  };
+  var calEvent = e.data.calEvent;
+  fetch(HOST + '/api/events/' + calEvent.id, {
+    method: 'put',
+    headers: {
+      Accept: 'application/json',
+      "Content-type": 'application/json'
+    },
+    credentials: 'same-origin',
+    body: JSON.stringify(event)
+  }).then(function (response) {
+    if (response.status === 400 || response.status === 200) {
+      return response.json();
+    }
+  }).then(function (json) {
+    if (json.message === 'Validation Failed') {
+      showValidationErrors(json.errors.children);
+    } else {
+      var calendar = __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#calendar').fullCalendar('getCalendar');
+      calEvent.title = __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#title').val();
+      calEvent.start = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.fullCalendar.moment(__WEBPACK_IMPORTED_MODULE_0_jquery___default()('#start').val());
+      calEvent.end = __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.fullCalendar.moment(__WEBPACK_IMPORTED_MODULE_0_jquery___default()('#end').val());
+      calendar.updateEvent(calEvent);
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.modal.close();
+    }
+  }).catch(function (err) {
+    console.log(err);
+  });
+}
+
+function deleteEvent(e) {
+  e.stopPropagation();
+  var id = e.data.id;
+  fetch(HOST + '/api/events/' + id, {
+    method: 'delete',
+    headers: {
+      Accept: 'application/json'
+    },
+    credentials: 'same-origin'
+  }).then(function (response) {
+    if (response.status === 204) {
+      var calendar = __WEBPACK_IMPORTED_MODULE_0_jquery___default()('#calendar').fullCalendar('getCalendar');
+      calendar.removeEvents(id);
+      __WEBPACK_IMPORTED_MODULE_0_jquery___default.a.modal.close();
+    }
+  }).catch(function (err) {
+    return console.log(err);
   });
 }
 

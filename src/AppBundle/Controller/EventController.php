@@ -83,4 +83,16 @@ class EventController extends FOSRestController implements ClassResourceInterfac
               ->findUserEvents($this->getUser()->getId())
           ];
     }
+
+    /**
+     * @View(statusCode=204, serializerGroups={"default"})
+     */
+    public function deleteAction($id)
+    {
+        $event = $this->getDoctrine()->getRepository(Event::class)
+          ->getUserEvent($id, $this->getUser()->getId());
+
+        $this->entityManager->remove($event);
+        $this->entityManager->flush();
+    }
 }
